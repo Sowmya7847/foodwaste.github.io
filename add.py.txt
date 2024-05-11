@@ -1,0 +1,254 @@
+import tornado.web
+import tornado.ioloop
+import random
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("index.html")
+
+class GenerateRecipeHandler(tornado.web.RequestHandler):
+    def post(self):
+        meal_type = self.get_argument("mealType")
+        diet_type = self.get_argument("dietType")
+        cuisine = self.get_argument("cuisine")
+
+        # Sample Indian recipes data
+        INDIAN_RECIPES = [
+            {
+                "name": "Butter Chicken",
+                "ingredients": ["chicken", "butter", "tomato", "cream", "spices"],
+                "meal_type": "dinner",
+                "diet_type": "non-vegetarian",
+                "cuisine": "North Indian",
+                "cooking_time": "45 minutes",
+                "calories_per_serving": 350,
+                "steps": [
+                    "Marinate chicken with yogurt and spices.",
+                    "Cook marinated chicken in a pan until done.",
+                    "Prepare tomato-based gravy with butter and cream.",
+                    "Add cooked chicken to the gravy and simmer.",
+                    "Garnish with fresh cream and coriander leaves."
+                ]
+            },
+            {
+                "name": "Palak Paneer",
+                "ingredients": ["spinach", "paneer", "onion", "tomato", "spices"],
+                "meal_type": "lunch",
+                "diet_type": "vegetarian",
+                "cuisine": "North Indian",
+                "cooking_time": "30 minutes",
+                "calories_per_serving": 300,
+                "steps": [
+                    "Blanch spinach and puree it.",
+                    "Sauté onion and tomato in a pan.",
+                    "Add spinach puree and spices, cook until thickened.",
+                    "Add cubed paneer and simmer.",
+                    "Serve hot with roti or rice."
+                ]
+            },
+            {
+                "name": "Chole Bhature",
+                "ingredients": ["chickpeas", "flour", "spices", "yogurt"],
+                "meal_type": "lunch",
+                "diet_type": "vegetarian",
+                "cuisine": "Punjabi",
+                "cooking_time": "1 hour",
+                "calories_per_serving": 400,
+                "steps": [
+                    "Soak chickpeas overnight and pressure cook until soft.",
+                    "Prepare dough for bhature and let it rest.",
+                    "Cook chickpeas with spices until flavors blend.",
+                    "Roll out dough, deep fry until golden brown.",
+                    "Serve hot with chole and onions."
+                ]
+            },
+            {
+                "name": "Chicken Biryani",
+                "ingredients": ["chicken", "rice", "spices", "yogurt"],
+                "meal_type": "dinner",
+                "diet_type": "non-vegetarian",
+                "cuisine": "Hyderabadi",
+                "cooking_time": "1.5 hours",
+                "calories_per_serving": 500,
+                "steps": [
+                    "Marinate chicken with yogurt and spices.",
+                    "Cook rice until half done.",
+                    "Layer marinated chicken and rice in a pot.",
+                    "Cook on low heat until chicken and rice are done.",
+                    "Serve hot with raita and salad."
+                ]
+            },
+            {
+                "name": "Masoor Dal",
+                "ingredients": ["red lentils", "onion", "tomato", "spices"],
+                "meal_type": "lunch",
+                "diet_type": "vegetarian",
+                "cuisine": "North Indian",
+                "cooking_time": "40 minutes",
+                "calories_per_serving": 250,
+                "steps": [
+                    "Cook lentils with water and salt until soft.",
+                    "Prepare tempering with spices and onions.",
+                    "Add tomatoes and cooked lentils, simmer.",
+                    "Garnish with cilantro and serve hot."
+                ]
+            },
+            {
+                "name": "Paneer Tikka",
+                "ingredients": ["paneer", "bell peppers", "onion", "spices"],
+                "meal_type": "appetizer",
+                "diet_type": "vegetarian",
+                "cuisine": "Punjabi",
+                "cooking_time": "30 minutes",
+                "calories_per_serving": 200,
+                "steps": [
+                    "Marinate paneer and vegetables with yogurt and spices.",
+                    "Thread onto skewers and grill until charred.",
+                    "Serve hot with mint chutney."
+                ]
+            },
+            {
+                "name": "Dosa",
+                "ingredients": ["rice", "lentils", "spices"],
+                "meal_type": "breakfast",
+                "diet_type": "vegetarian",
+                "cuisine": "South Indian",
+                "cooking_time": "30 minutes",
+                "calories_per_serving": 300,
+                "steps": [
+                    "Soak rice and lentils separately for a few hours.",
+                    "Grind into a smooth batter, ferment overnight.",
+                    "Heat a griddle, spread batter, cook until crisp.",
+                    "Serve hot with sambar and chutney."
+                ]
+            },
+            {
+                "name": "Rogan Josh",
+                "ingredients": ["lamb", "yogurt", "onion", "spices"],
+                "meal_type": "dinner",
+                "diet_type": "non-vegetarian",
+                "cuisine": "Kashmiri",
+                "cooking_time": "1 hour",
+                "calories_per_serving": 450,
+                "steps": [
+                    "Sauté onions until golden brown.",
+                    "Add marinated lamb and cook until browned.",
+                    "Add spices and yogurt, simmer until lamb is tender.",
+                    "Garnish with fried onions and serve hot."
+                ]
+            },
+            {
+                "name": "Pani Puri",
+                "ingredients": ["semolina", "potatoes", "spices", "tamarind chutney"],
+                "meal_type": "snack",
+                "diet_type": "vegetarian",
+                "cuisine": "Maharashtrian",
+                "cooking_time": "1 hour",
+                "calories_per_serving": 150,
+                "steps": [
+                    "Prepare dough with semolina, let it rest.",
+                    "Boil and mash potatoes, add spices.",
+                    "Make small puris from dough, fry until crisp.",
+                    "Assemble puris with potatoes and tamarind water.",
+                    "Serve immediately."
+                ]
+            },
+            {
+                "name": "Aloo Paratha",
+                "ingredients": ["whole wheat flour", "potatoes", "spices"],
+                "meal_type": "breakfast",
+                "diet_type": "vegetarian",
+                "cuisine": "Punjabi",
+                "cooking_time": "30 minutes",
+                "calories_per_serving": 250,
+                "steps": [
+                    "Boil and mash potatoes, add spices.",
+                    "Prepare dough with wheat flour, stuff with potato mixture.",
+                    "Roll out stuffed dough, cook on griddle with ghee.",
+                    "Serve hot with yogurt or pickle."
+                ]
+            },
+            {
+                "name": "Gajar Halwa",
+                "ingredients": ["carrots", "milk", "sugar", "ghee"],
+                "meal_type": "dessert",
+                "diet_type": "vegetarian",
+                "cuisine": "North Indian",
+                "cooking_time": "1 hour",
+                "calories_per_serving": 300,
+                "steps": [
+                    "Grate carrots and cook with milk until soft.",
+                    "Add sugar and cook until milk evaporates.",
+                    "Sauté in ghee until halwa is thickened.",
+                    "Garnish with nuts and serve warm."
+                ]
+            },
+            {
+                "name": "Fish Curry",
+                "ingredients": ["fish", "coconut milk", "spices", "curry leaves"],
+                "meal_type": "dinner",
+                "diet_type": "non-vegetarian",
+                "cuisine": "Goan",
+                "cooking_time": "40 minutes",
+                "calories_per_serving": 400,
+                "steps": [
+                    "Prepare coconut-based masala with spices.",
+                    "Add fish pieces and cook until done.",
+                    "Temper with curry leaves and mustard seeds.",
+                    "Serve hot with rice or bread."
+                ]
+            },
+            {
+                "name": "Rasgulla",
+                "ingredients": ["milk", "sugar", "lemon juice"],
+                "meal_type": "dessert",
+                "diet_type": "vegetarian",
+                "cuisine": "Bengali",
+                "cooking_time": "1 hour",
+                "calories_per_serving": 200,
+                "steps": [
+                    "Boil milk, curdle with lemon juice.",
+                    "Strain and knead the chenna until smooth.",
+                    "Shape into balls, boil in sugar syrup.",
+                    "Serve chilled."
+                ]
+            },
+            {
+                "name": "Pav Bhaji",
+                "ingredients": ["potatoes", "mixed vegetables", "butter", "spices", "pav"],
+                "meal_type": "snack",
+                "diet_type": "vegetarian",
+                "cuisine": "Mumbai",
+                "cooking_time": "40 minutes",
+                "calories_per_serving": 350,
+                "steps": [
+                    "Boil and mash potatoes, cook mixed vegetables.",
+                    "Prepare masala with spices and butter.",
+                    "Mix mashed potatoes and vegetables with masala.",
+                    "Serve hot with buttered pav."
+                ]
+            }
+        ]
+
+        # Filter recipes based on user preferences
+        filtered_recipes = [recipe for recipe in INDIAN_RECIPES if recipe["meal_type"] == meal_type
+                            and recipe["diet_type"] == diet_type and recipe["cuisine"] == cuisine]
+
+        if filtered_recipes:
+            # Randomly select a recipe from filtered list
+            selected_recipe = random.choice(filtered_recipes)
+            self.render("recipe.html", recipe=selected_recipe)
+        else:
+            self.write("No matching recipe found. Please try different preferences.")
+
+def make_app():
+    return tornado.web.Application([
+        (r"/", MainHandler),
+        (r"/generate_recipe", GenerateRecipeHandler),
+        (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "static"}),
+    ])
+
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
